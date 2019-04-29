@@ -1,13 +1,21 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import '../styles/App.css';
+import React from "react";
+import logo from "../assets/logo.svg";
+import "../styles/App.css";
 
-class App extends Component {
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      test: false
+    };
+  }
+
   render() {
+    const { test } = this.state;
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
+          {test ? <img src={logo} className="App-logo" alt="logo" /> : null}
           <h1 className="App-title">Welcome to React</h1>
         </header>
         <p className="App-intro">
