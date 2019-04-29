@@ -1,0 +1,31 @@
+{
+  "name": "wechatdataanalysis",
+  "description": "微信数据分析",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.js",
+  "dependencies": {
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2"
+  },
+  "devDependencies": {
+    "react-scripts": "1.1.5"
+  },
+  "scripts": {
+    "electron-start": "electron .",
+    "start": "NODE_ENV=development react-scripts start",
+    "build": "NODE_ENV=production react-scripts build",
+    "test": "NODE_ENV=test react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhengzhp/WeChatDataAnalysis.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhengzhp/WeChatDataAnalysis/issues"
+  },
+  "homepage": "https://github.com/zhengzhp/WeChatDataAnalysis#readme"
+}
