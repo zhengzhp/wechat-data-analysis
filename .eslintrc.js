@@ -5,14 +5,21 @@ module.exports = {
     node: true,
     es6: true,
   },
-  extends: ["airbnb", "prettier", "plugin:compat/recommended"],
+  extends: [
+    "airbnb",
+    "prettier",
+    "plugin:import/electron",
+    "eslint:recommended",
+  ],
   globals: {
     Atomics: "readonly",
     SharedArrayBuffer: "readonly",
     it: true,
+    React: true,
   },
   parserOptions: {
     ecmaFeatures: {
+      experimentalObjectRestSpread: true,
       jsx: true,
     },
     ecmaVersion: 2018,
@@ -30,5 +37,7 @@ module.exports = {
     "jsx-a11y/no-static-element-interactions": 0,
     "jsx-a11y/anchor-is-valid": 0,
     "linebreak-style": 0,
+    "no-underscore-dangle": 0,
+    "no-console": 1,
   },
 };

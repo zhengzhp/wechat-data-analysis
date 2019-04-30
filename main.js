@@ -1,8 +1,7 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const url = require("url");
-// const config =
-const config = require("./config/env");
+const config = require("./config/config");
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -13,16 +12,16 @@ function createWindow() {
   win = new BrowserWindow({ width: 1200, height: 800 });
 
   // and load the index.html of the app.
-  //判断是否是开发模式
+  // 判断是否是开发模式
   if (config.globals.__DEV__) {
-    win.loadURL("http://localhost:3000/");
+    win.loadURL("http://localhost:8338/");
   } else {
     win.loadURL(
       url.format({
         pathname: path.join(__dirname, "./build/index.html"),
         protocol: "file:",
-        slashes: true,
-      }),
+        slashes: true
+      })
     );
   }
   // Open the DevTools.

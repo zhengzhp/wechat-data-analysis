@@ -1,13 +1,18 @@
 import React from "react";
 import logo from "../assets/logo.svg";
+import userList from "../model/userList";
 import "../styles/App.css";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      test: false
+      test: true
     };
+  }
+
+  componentDidMount(){
+    userList()
   }
 
   render() {
