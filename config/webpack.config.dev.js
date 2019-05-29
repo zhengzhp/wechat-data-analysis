@@ -168,7 +168,7 @@ module.exports = {
           // in development "style" loader enables hot editing of CSS.
           {
             test: /\.css$/,
-            exclude: /node_modules|antd\.css/,
+            exclude: /node_modules|antd\.css|\.global/,
             use: [
               require.resolve('style-loader'),
               {
@@ -187,7 +187,7 @@ module.exports = {
           },
           {
             test: /\.css$/,
-            include: /node_modules|antd\.css/,
+            include: /node_modules|antd\.css|\.global/,
             use: [
               require.resolve('style-loader'),
               {
@@ -198,21 +198,6 @@ module.exports = {
               },
               {
                 loader: require.resolve('postcss-loader'),
-                options: {
-                  ident: 'postcss',
-                  plugins: () => [
-                    require('postcss-flexbugs-fixes'),
-                    autoprefixer({
-                      browsers: [
-                        '>1%',
-                        'last 4 versions',
-                        'Firefox ESR',
-                        'not ie < 9', // React doesn't support IE8 anyway
-                      ],
-                      flexbox: 'no-2009',
-                    }),
-                  ],
-                },
               },
             ],
           },

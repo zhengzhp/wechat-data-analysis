@@ -31,14 +31,16 @@ export function getUserList(documentsPath) {
       })
       let content = fs.readFileSync(mmsettingPath, 'utf8')
       let userData = plist.parse(content).$objects
+      console.log(userData)
+
       userList.push({
+        id: fileList[i],
         nickname: userData[3], // 昵称
         wechatID: userData[2], // 微信号
         headUrl: getHeadImg(userData),
       })
     }
   }
-  console.log(userList)
   return userList
 }
 export default {}

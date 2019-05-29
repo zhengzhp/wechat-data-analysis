@@ -13,3 +13,39 @@
     margin-top: 20px;
   }
 }
+
+.card-list {
+  width: 100%;
+  margin-top: 20px !important;
+
+  p {
+    text-align: center;
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dadada;
+  }
+
+  :global {
+    .ant-card-body {
+      padding: 12px;
+
+      >div {
+        cursor: pointer;
+        padding: 8px;
+        overflow: hidden;
+        border-bottom: 1px solid #dadada;
+      }
+
+      >div:last-child {
+        border: 0;
+      }
+    }
+  }
+
+
+
+  span:nth-child(2),
+  span:nth-child(3) {
+    margin-left: 20px;
+  }
+}
