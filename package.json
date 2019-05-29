@@ -6,16 +6,19 @@
   "main": "main.js",
   "scripts": {
     "electron-start": "electron . & yarn run start",
-    "start": "PORT=8338 NODE_ENV=development node client/scripts/start.js",
-    "build": "NODE_ENV=production node client/scripts/build.js",
-    "test": "NODE_ENV=test node client/scripts/test.js --env=jsdom"
+    "start": "PORT=8338 NODE_ENV=development node scripts/start.js",
+    "build": "NODE_ENV=production node scripts/build.js",
+    "test": "NODE_ENV=test node scripts/test.js --env=jsdom"
   },
   "dependencies": {
+    "antd": "^3.19.1",
     "autoprefixer": "7.1.6",
     "babel-core": "6.26.0",
     "babel-eslint": "7.2.3",
     "babel-jest": "20.0.3",
     "babel-loader": "7.1.2",
+    "babel-plugin-import": "^1.11.2",
+    "babel-plugin-react-css-modules": "3.4.2",
     "babel-preset-react-app": "^3.1.2",
     "babel-runtime": "6.26.0",
     "case-sensitive-paths-webpack-plugin": "2.1.1",
@@ -40,17 +43,29 @@
     "fs-extra": "3.0.1",
     "html-webpack-plugin": "2.29.0",
     "jest": "20.0.4",
+    "less": "^3.9.0",
+    "less-loader": "^5.0.0",
+    "npm": "^6.9.0",
     "object-assign": "4.1.1",
     "plist": "^3.0.1",
+    "postcss-calc": "^7.0.1",
     "postcss-flexbugs-fixes": "3.2.0",
+    "postcss-global-import": "^1.0.6",
+    "postcss-import": "^12.0.1",
     "postcss-loader": "2.0.8",
+    "postcss-media-minmax": "^4.0.0",
+    "postcss-nested": "^4.1.2",
+    "postcss-nesting": "^7.0.0",
+    "postcss-preset-env": "^6.6.0",
     "promise": "8.0.1",
     "raf": "3.4.0",
     "react": "^16.4.2",
     "react-dev-utils": "^5.0.2",
     "react-dom": "^16.4.2",
+    "readable-stream": "^3.4.0",
     "redux-saga": "^1.0.2",
     "resolve": "1.6.0",
+    "rucksack-css": "^1.0.2",
     "style-loader": "0.19.0",
     "sw-precache-webpack-plugin": "0.11.4",
     "url-loader": "0.6.2",
@@ -69,7 +84,7 @@
   "bugs": {
     "url": "https://github.com/zhengzhp/WeChatDataAnalysis/issues"
   },
-  "homepage": "https://github.com/zhengzhp/WeChatDataAnalysis#readme",
+  "homepage": ".",
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,mjs}"
@@ -107,6 +122,10 @@
   "babel": {
     "presets": [
       "react-app"
+    ],
+    "plugins": [
+      "transform-react-jsx",
+      "transform-runtime"
     ]
   },
   "eslintConfig": {

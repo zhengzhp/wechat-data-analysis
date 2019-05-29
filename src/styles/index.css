@@ -1,0 +1,15 @@
+.outer-container {
+  font-size: responsive;
+  display: flex;
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  width: 400px;
+  margin-left: -200px;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  input {
+    margin-top: 20px;
+  }
+}
