@@ -2,8 +2,6 @@ var fs = window.require('fs')
 var path = require('path')
 var plist = require('plist')
 
-// const documentsPath = '/Users/zhengzhipeng/Desktop/WeChatData/Documents'
-
 function getHeadImg(userInfo) {
   let url = userInfo.filter(element => {
     if (
@@ -34,13 +32,28 @@ export function getUserList(documentsPath) {
       console.log(userData)
 
       userList.push({
-        id: fileList[i],
+        MD5: fileList[i],
         nickname: userData[3], // 昵称
         wechatID: userData[2], // 微信号
         headUrl: getHeadImg(userData),
       })
     }
   }
+  // let userJson = {}
+  // userList.forEach(value => {
+  //   userJson[value.MD5] = {
+  //     md5: value.MD5,
+  //     nickname: value.nickname,
+  //     wechatID: value.wechatID,
+  //     headUrl: value.headUrl,
+  //   }
+  // })
+
+  // fs.writeFile('./src/data/user.json', JSON.stringify(userJson), { flag: 'w' }, function(err) {
+  //   if (err) throw err
+  //   console.log('用户数据存储成功')
+  // })
+
   return userList
 }
 export default {}

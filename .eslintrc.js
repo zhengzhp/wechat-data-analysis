@@ -22,6 +22,7 @@ module.exports = {
   },
   plugins: ['redux-saga', 'react', 'jsx-a11y'],
   rules: {
+    "experimentalDecorators": true, 
     'jsx-a11y/click-events-have-key-events': 0,
     'jsx-a11y/mouse-events-have-key-events': 0,
     'jsx-a11y/no-noninteractive-element-interactions': 0,

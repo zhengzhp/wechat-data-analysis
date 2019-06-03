@@ -12,7 +12,7 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1200,
     height: 800,
-    // Electron 5.0需要设置nodeIntegration1️以支持window.require
+    // Electron 5.0需要设置nodeIntegration以支持window.require
     webPreferences: {
       nodeIntegration: true,
     },

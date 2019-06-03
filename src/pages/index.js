@@ -26,9 +26,12 @@ class App extends React.Component {
       userList: userlist,
     })
   }
-  selectUser(id) {
-    console.log(this.router)
-    this.router
+  selectUser(info) {
+    const { history } = this.props
+    const { MD5 } = info
+    history.push({
+      pathname: `friend/${MD5}`,
+    })
   }
 
   openDialog() {
@@ -64,7 +67,7 @@ class App extends React.Component {
           <Card className={styles['card-list']}>
             <p>选择需要解析的用户数据</p>
             {userList.map(item => (
-              <div onClick={() => this.selectUser(item.id)} className="nowrap" key={item.wechatID}>
+              <div onClick={() => this.selectUser(item)} className="nowrap" key={item.wechatID}>
                 <Avatar src={item.headUrl}>USER</Avatar>
                 <span>用户名：{item.nickname}</span>
                 <span>ID：{item.wechatID}</span>

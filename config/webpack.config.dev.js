@@ -1,5 +1,4 @@
 /* eslint-disable global-require */
-const autoprefixer = require('autoprefixer')
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -28,6 +27,10 @@ const env = getClientEnvironment(publicUrl)
 // It is focused on developer experience and fast rebuilds.
 // The production configuration is different and lives in a separate file.
 module.exports = {
+  // target: 'node',
+  externals: {
+    sqlite3: 'commonjs sqlite3',
+  },
   // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
   // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
   devtool: 'cheap-module-source-map',
@@ -182,7 +185,7 @@ module.exports = {
               // 在postcss.config.js 中配置
               {
                 loader: require.resolve('postcss-loader'),
-              }
+              },
             ],
           },
           {
