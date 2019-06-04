@@ -1,7 +1,37 @@
 export function getNickName(fullNameInfo) {
-  var sep = fullNameInfo.split('"')
-  sep.pop()
-  return sep
+  // 过滤掉不能正常展示的ASCII码
+  // eslint-disable-next-line no-control-regex
+  var sep = fullNameInfo.replace(/[\x00-\x1f]+/g, '|').split('"')[0]
+  return sep.split('|').filter(value => value !== '')
+}
+
+export function getChatterMd5(tableName) {
+  var sep = tableName.split('_')
+  return sep.pop()
+}
+
+export function getHeadImg(headImage) {
+  var str = headImage.toString('utf8')
+  var start = str.search('http:')
+  var end = str.search('/132')
+  return str.slice(start, end)
+}
+
+export function getMomentsBg(dbSocial) {
+  var str = dbSocial.toString('utf8')
+  let start = str.search(/http/)
+  let end = str.search(/\/0R/)
+  return str !== -1 ? str.slice(start, end + 2) : str
+}
+
+export function isPhoneAdd(dbSocial) {
+  var str = dbSocial.toString('utf8')
+  let end = str.search(/\/0R/)
+  if (str[end + 4] === 'Z') {
+    return str.slice(str.length - 13, str.length - 2)
+  } else {
+    return null
+  }
 }
 
 export function Utf8ArrayToStr(array) {

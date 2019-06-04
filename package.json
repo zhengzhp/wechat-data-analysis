@@ -74,6 +74,7 @@
     "sqlite3": "^4.0.8",
     "style-loader": "0.19.0",
     "sw-precache-webpack-plugin": "0.11.4",
+    "text-encoding": "^0.7.0",
     "url-loader": "0.6.2",
     "webpack": "3.8.1",
     "webpack-dev-server": "2.11.3",

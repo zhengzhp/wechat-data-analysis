@@ -1,0 +1,35 @@
+.left-container {
+  width: 37%;
+  min-width: 350px;
+
+  :global {
+    .ant-tabs-nav {
+      display: block;
+
+      >div {
+        display: flex;
+        justify-content: space-around;
+      }
+    }
+
+    .ant-tabs-nav .ant-tabs-tab-active,
+    .ant-tabs-nav .ant-tabs-tab {
+      margin: 0;
+      width: 33.3%;
+      text-align: center;
+    }
+  }
+}
+
+.outer-tabs {
+  :global {
+    .ant-tabs-content {
+      p {
+        padding: 0 20px;
+        margin: 0;
+        height: 50px;
+        line-height: 50px;
+      }
+    }
+  }
+}

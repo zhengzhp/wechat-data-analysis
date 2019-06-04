@@ -9,16 +9,17 @@ import './styles/common.global.css'
 import registerServiceWorker from './registerServiceWorker'
 
 const Back = withRouter(props => {
-  console.log(props)
   const { history, children } = props
   const goBack = () => {
     history.goBack()
   }
   return (
     <Fragment>
-      <Affix className="back">
-        <Icon onClick={goBack} className="back-arrow-left" type="arrow-left" />
-        <span>返回上一步</span>
+      <Affix>
+        <div className="back">
+          <Icon onClick={goBack} className="back-arrow-left" type="arrow-left" />
+          <span>返回上一步</span>
+        </div>
       </Affix>
       {children}
     </Fragment>

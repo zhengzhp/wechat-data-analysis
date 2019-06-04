@@ -729,21 +729,6 @@ autoprefixer@^9.4.9:
     postcss "^7.0.14"
     postcss-value-parser "^3.3.1"
 
-aws-sdk@^2.465.0:
-  version "2.465.0"
-  resolved "http://r.cnpmjs.org/aws-sdk/download/aws-sdk-2.465.0.tgz#60948a0930473f50bac23311bc48426118e79f12"
-  integrity sha1-YJSKCTBHP1C6wjMRvEhCYRjnnxI=
-  dependencies:
-    buffer "4.9.1"
-    events "1.1.1"
-    ieee754 "1.1.8"
-    jmespath "0.15.0"
-    querystring "0.2.0"
-    sax "1.2.1"
-    url "0.10.3"
-    uuid "3.3.2"
-    xml2js "0.4.19"
-
 aws-sign2@~0.7.0:
   version "0.7.0"
   resolved "http://r.cnpmjs.org/aws-sign2/download/aws-sign2-0.7.0.tgz#b46e890934a9591f2d2f6f86d7e6a9f1b3fe76a8"
@@ -1843,7 +1828,7 @@ buffer-xor@^1.0.3:
   resolved "http://r.cnpmjs.org/buffer-xor/download/buffer-xor-1.0.3.tgz#26e61ed1422fb70dd42e6e36729ed51d855fe8d9"
   integrity sha1-JuYe0UIvtw3ULm42cp7VHYVf6Nk=
 
-buffer@4.9.1, buffer@^4.3.0:
+buffer@^4.3.0:
   version "4.9.1"
   resolved "http://r.cnpmjs.org/buffer/download/buffer-4.9.1.tgz#6d1bb601b07a4efced97094132093027c95bc298"
   integrity sha1-bRu2AbB6TvztlwlBMgkwJ8lbwpg=
@@ -3752,11 +3737,6 @@ eventlistener@0.0.1:
   resolved "http://r.cnpmjs.org/eventlistener/download/eventlistener-0.0.1.tgz#ed2baabb852227af2bcf889152c72c63ca532eb8"
   integrity sha1-7Suqu4UiJ68rz4iRUscsY8pTLrg=
 
-events@1.1.1:
-  version "1.1.1"
-  resolved "http://r.cnpmjs.org/events/download/events-1.1.1.tgz#9ebdb7635ad099c70dcc4c2a1f5004288e8bd924"
-  integrity sha1-nr23Y1rQmccNzEwqH1AEKI6L2SQ=
-
 events@^3.0.0:
   version "3.0.0"
   resolved "http://r.cnpmjs.org/events/download/events-3.0.0.tgz#9a0a0dfaf62893d92b875b8f2698ca4114973e88"
@@ -4930,11 +4910,6 @@ icss-utils@^2.1.0:
   dependencies:
     postcss "^6.0.1"
 
-ieee754@1.1.8:
-  version "1.1.8"
-  resolved "http://r.cnpmjs.org/ieee754/download/ieee754-1.1.8.tgz#be33d40ac10ef1926701f6f08a2d86fbfd1ad3e4"
-  integrity sha1-vjPUCsEO8ZJnAfbwii2G+/0a0+Q=
-
 ieee754@^1.1.4:
   version "1.1.13"
   resolved "http://r.cnpmjs.org/ieee754/download/ieee754-1.1.13.tgz#ec168558e95aa181fd87d37f55c32bbcb6708b84"
@@ -5786,11 +5761,6 @@ jest@20.0.4:
   integrity sha1-PdJgwpidba1nix6cxNkZRPbWAqw=
   dependencies:
     jest-cli "^20.0.4"
-
-jmespath@0.15.0:
-  version "0.15.0"
-  resolved "http://r.cnpmjs.org/jmespath/download/jmespath-0.15.0.tgz#a3f222a9aae9f966f5d27c796510e28091764217"
-  integrity sha1-o/Iiqarp+Wb10nx5ZRDigJF2Qhc=
 
 js-base64@^2.1.9:
   version "2.5.1"
@@ -10255,12 +10225,7 @@ sane@~1.6.0:
     walker "~1.0.5"
     watch "~0.10.0"
 
-sax@1.2.1:
-  version "1.2.1"
-  resolved "http://r.cnpmjs.org/sax/download/sax-1.2.1.tgz#7b8e656190b228e81a66aea748480d828cd2d37a"
-  integrity sha1-e45lYZCyKOgaZq6nSEgNgozS03o=
-
-sax@>=0.6.0, sax@^1.2.1, sax@^1.2.4, sax@~1.2.1:
+sax@^1.2.1, sax@^1.2.4, sax@~1.2.1:
   version "1.2.4"
   resolved "http://r.cnpmjs.org/sax/download/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha1-KBYjTiN4vdxOU1T6tcqold9xANk=
@@ -11068,6 +11033,11 @@ test-exclude@^4.2.1:
     read-pkg-up "^1.0.1"
     require-main-filename "^1.0.1"
 
+text-encoding@^0.7.0:
+  version "0.7.0"
+  resolved "http://r.cnpmjs.org/text-encoding/download/text-encoding-0.7.0.tgz#f895e836e45990624086601798ea98e8f36ee643"
+  integrity sha1-+JXoNuRZkGJAhmAXmOqY6PNu5kM=
+
 text-table@0.2.0, text-table@~0.2.0:
   version "0.2.0"
   resolved "http://r.cnpmjs.org/text-table/download/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
@@ -11491,14 +11461,6 @@ url-parse@^1.1.8, url-parse@^1.4.3:
     querystringify "^2.1.1"
     requires-port "^1.0.0"
 
-url@0.10.3:
-  version "0.10.3"
-  resolved "http://r.cnpmjs.org/url/download/url-0.10.3.tgz#021e4d9c7705f21bbf37d03ceb58767402774c64"
-  integrity sha1-Ah5NnHcF8hu/N9A861h2dAJ3TGQ=
-  dependencies:
-    punycode "1.3.2"
-    querystring "0.2.0"
-
 url@^0.11.0:
   version "0.11.0"
   resolved "http://r.cnpmjs.org/url/download/url-0.11.0.tgz#3838e97cfc60521eb73c525a8e55bfdd9e2e28f1"
@@ -11546,7 +11508,7 @@ utils-merge@1.0.1:
   resolved "http://r.cnpmjs.org/utils-merge/download/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
 
-uuid@3.3.2, uuid@^3.0.1, uuid@^3.3.2:
+uuid@^3.0.1, uuid@^3.3.2:
   version "3.3.2"
   resolved "http://r.cnpmjs.org/uuid/download/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
   integrity sha1-G0r0lV6zB3xQHCOHL8ZROBFYcTE=
@@ -11898,15 +11860,7 @@ xml-name-validator@^2.0.1:
   resolved "http://r.cnpmjs.org/xml-name-validator/download/xml-name-validator-2.0.1.tgz#4d8b8f1eccd3419aa362061becef515e1e559635"
   integrity sha1-TYuPHszTQZqjYgYb7O9RXh5VljU=
 
-xml2js@0.4.19:
-  version "0.4.19"
-  resolved "http://r.cnpmjs.org/xml2js/download/xml2js-0.4.19.tgz#686c20f213209e94abf0d1bcf1efaa291c7827a7"
-  integrity sha1-aGwg8hMgnpSr8NG88e+qKRx4J6c=
-  dependencies:
-    sax ">=0.6.0"
-    xmlbuilder "~9.0.1"
-
-xmlbuilder@^9.0.7, xmlbuilder@~9.0.1:
+xmlbuilder@^9.0.7:
   version "9.0.7"
   resolved "http://r.cnpmjs.org/xmlbuilder/download/xmlbuilder-9.0.7.tgz#132ee63d2ec5565c557e20f4c22df9aca686b10d"
   integrity sha1-Ey7mPS7FVlxVfiD0wi35rKaGsQ0=

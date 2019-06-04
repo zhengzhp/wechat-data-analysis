@@ -2,17 +2,22 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import md5 from 'js-md5'
 import { Tabs, Button } from 'antd'
+import textEncoding from 'text-encoding'
+import '../styles/friend.css'
+
 // import user from '../data/user.json'
-import { getNickName, Utf8ArrayToStr } from '../utils/utils'
+import { getNickName, getChatterMd5, getHeadImg, getMomentsBg, isPhoneAdd } from '../utils/utils'
 import HandleDB from '../utils/handledb'
 
 const { TabPane } = Tabs
-
+const TextDecoder = textEncoding.TextDecoder
 const sqlitePath =
-  '/Users/zhengzhipeng/Desktop/Documents/bc409b1c68e01d1c79e869dcd6048452/DB/WCDB_Contact.sqlite'
+  '/Users/zhengzhipeng/Desktop/Documents/5d36756da6a6f71e68185f13ddd4bb18/DB/WCDB_Contact.sqlite'
 const sqlitefilePath =
-  '/Users/zhengzhipeng/Desktop/Documents/bc409b1c68e01d1c79e869dcd6048452/DB/MM.sqlite'
-
+  '/Users/zhengzhipeng/Desktop/Documents/5d36756da6a6f71e68185f13ddd4bb18/DB/MM.sqlite'
+var mailList = {}
+const [groupList, officialList, friendList] = [{}, {}, {}]
+const limitNum = 20
 // 5d36756da6a6f71e68185f13ddd4bb18
 // bc409b1c68e01d1c79e869dcd6048452
 class Friend extends React.Component {
@@ -20,17 +25,28 @@ class Friend extends React.Component {
     super(props)
     this.state = {
       myFriends: {},
-      myGroup: {},
-      myOfficial: {},
+      myGroups: {},
+      myOfficials: {},
     }
   }
 
   async componentDidMount() {
     // const { match } = this.props
     // const userMD5 = match.params.id
-    // console.log(sqlite3)
-    const { myFriends, myGroup, myOfficial } = this.state
-    this.getChat()
+    await this.getFriends()
+    let PromiseList = await this.getChat()
+    Promise.all(PromiseList).then(result => {
+      console.log(friendList)
+      // Object.keys(friendList).map((item)=>{
+      //   console.log(item)
+      // })
+      mailList = {}
+      this.setState({
+        myFriends: friendList,
+        myGroups: groupList,
+        myOfficials: officialList,
+      })
+    })
   }
 
   async getChat() {
@@ -45,25 +61,46 @@ class Friend extends React.Component {
       'all'
     )
 
-    function getCount(cahtName) {
-      let sql = 'select count(*) as count from ' + cahtName
+    function getCount(chatName) {
+      let sql = 'select count(*) as count from ' + chatName
       return db.sql(sql, 'get')
     }
+
+    let PromiseList = []
+
     chatData.forEach(value => {
-      getCount(value.name)
-        .then(result => {
-          return new Promise(resolve => {
-            resolve([value.name, result.count])
-          })
+      PromiseList.push(
+        getCount(value.name).then(result => {
+          let chatMd5 = getChatterMd5(value.name)
+          // 过滤已迁移的公众号没有对应账号信息，但是有聊天信息
+          if (mailList[chatMd5] !== undefined && result.count > limitNum) {
+            let { wechatID, nickName, momentsBg, phone, headImg } = mailList[chatMd5]
+            let baseInfo = {
+              wechatID,
+              nickName,
+              chatName: value.name,
+              chatMd5: chatMd5,
+              count: result.count,
+              headImg,
+            }
+
+            if (wechatID.indexOf('@chatroom') !== -1) {
+              groupList[chatMd5] = baseInfo
+            } else if (wechatID.indexOf('gh_') !== -1) {
+              officialList[chatMd5] = baseInfo
+            } else {
+              friendList[chatMd5] = Object.assign({}, baseInfo, { momentsBg, phone })
+            }
+          }
+          return result
         })
-        .then(result => {
-          console.log(result)
-        })
+      )
     })
+
+    return PromiseList
   }
 
   async getFriends() {
-    const friendList = {}
     const contactDb = new HandleDB({
       databaseFile: sqlitePath,
       readOnly: true,
@@ -72,53 +109,58 @@ class Friend extends React.Component {
 
     let friendData = await contactDb.sql('select * from Friend', 'all')
     friendData.forEach(value => {
-      if (getNickName(Utf8ArrayToStr(value.dbContactRemark)).length > 0) {
-        // console.log(value)
-        // console.log(getNickName(Utf8ArrayToStr(value.dbContactRemark)))
-        // console.log(Utf8ArrayToStr(value.dbContactLocal))
-        // let str = Utf8ArrayToStr(value.dbContactSocial)
-        // let start = Utf8ArrayToStr(value.dbContactSocial).search(/http/)
-        // let end = Utf8ArrayToStr(value.dbContactSocial).search(/\/0R/)
-        // let momentsBg = str !== -1 ? str.slice(start, end + 2) : str
-        // let isPhoneAdd = str[end + 4] === 'Z'
-        // let phone = null
+      let nickName = getNickName(new TextDecoder('utf-8').decode(value.dbContactRemark))
+      // getNickName(Utf8ArrayToStr(value.dbContactRemark))
+      // 过滤掉没有昵称的账号
+      if (nickName.length > 0) {
+        let momentsBg = getMomentsBg(value.dbContactSocial)
+        let headImg = getHeadImg(value.dbContactHeadImage)
+        let phone = isPhoneAdd(value.dbContactSocial)
 
-        // if (isPhoneAdd) {
-        //   phone = str.slice(str.length - 13, str.length - 2)
-        // }
         var nameMd5 = md5(value.userName)
-        // friendList[nameMd5] = {
-        //   wechatID: value.userName,
-        //   nickName: getNickName(Utf8ArrayToStr(value.dbContactRemark)),
-        //   momentsBg,
-        //   phone,
-        // }
-        friendList[nameMd5] = {
+        mailList[nameMd5] = {
           wechatID: value.userName,
-          nickName: getNickName(Utf8ArrayToStr(value.dbContactRemark)),
+          nickName: nickName,
+          momentsBg,
+          phone,
+          headImg,
         }
       }
     })
-    return friendList
+    return mailList
   }
 
   render() {
+    const { myFriends, myGroups, myOfficials } = this.state
     return (
       <div>
         <Link to="/">
           <Button>回到首页</Button>
         </Link>
-        <Tabs>
-          <TabPane tab="朋友" key="1">
-            我的朋友
-          </TabPane>
-          <TabPane tab="群组" key="2">
-            我的群组
-          </TabPane>
-          <TabPane tab="公众号" key="3">
-            我的公众号
-          </TabPane>
-        </Tabs>
+        <div styleName="left-container">
+          <Tabs styleName="outer-tabs">
+            <TabPane tab="朋友" key="1">
+              {Object.keys(myFriends).map(key => (
+                <p key={key}>
+                  {myFriends[key].nickName[0]}
+                  {myFriends[key].nickName.length > 1
+                    ? `（${myFriends[key].nickName[myFriends[key].nickName.length - 1]}）`
+                    : null}
+                </p>
+              ))}
+            </TabPane>
+            <TabPane tab="群组" key="2">
+              {Object.keys(myGroups).map(key => (
+                <p key={key}>{myGroups[key].nickName}</p>
+              ))}
+            </TabPane>
+            <TabPane tab="公众号" key="3">
+              {Object.keys(myOfficials).map(key => (
+                <p key={key}>{myOfficials[key].nickName}</p>
+              ))}
+            </TabPane>
+          </Tabs>
+        </div>
       </div>
     )
   }
