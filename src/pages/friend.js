@@ -1,11 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import md5 from 'js-md5'
-import { Tabs, Button } from 'antd'
+import { Tabs, Avatar } from 'antd'
 import textEncoding from 'text-encoding'
 import '../styles/friend.css'
 
-// import user from '../data/user.json'
 import { getNickName, getChatterMd5, getHeadImg, getMomentsBg, isPhoneAdd } from '../utils/utils'
 import HandleDB from '../utils/handledb'
 
@@ -17,16 +16,17 @@ const sqlitefilePath =
   '/Users/zhengzhipeng/Desktop/Documents/5d36756da6a6f71e68185f13ddd4bb18/DB/MM.sqlite'
 var mailList = {}
 const [groupList, officialList, friendList] = [{}, {}, {}]
-const limitNum = 20
+const limitNum = 100
 // 5d36756da6a6f71e68185f13ddd4bb18
 // bc409b1c68e01d1c79e869dcd6048452
 class Friend extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      myFriends: {},
-      myGroups: {},
-      myOfficials: {},
+      myFriends: [],
+      myGroups: [],
+      myOfficials: [],
+      myMessages: [],
     }
   }
 
@@ -36,15 +36,15 @@ class Friend extends React.Component {
     await this.getFriends()
     let PromiseList = await this.getChat()
     Promise.all(PromiseList).then(result => {
-      console.log(friendList)
-      // Object.keys(friendList).map((item)=>{
-      //   console.log(item)
-      // })
+      let friends = Object.values(friendList).sort((a, b) => b.count - a.count)
+      let groups = Object.values(groupList).sort((a, b) => b.count - a.count)
+      let officials = Object.values(officialList).sort((a, b) => b.count - a.count)
+
       mailList = {}
       this.setState({
-        myFriends: friendList,
-        myGroups: groupList,
-        myOfficials: officialList,
+        myFriends: friends,
+        myGroups: groups,
+        myOfficials: officials,
       })
     })
   }
@@ -116,8 +116,9 @@ class Friend extends React.Component {
         let momentsBg = getMomentsBg(value.dbContactSocial)
         let headImg = getHeadImg(value.dbContactHeadImage)
         let phone = isPhoneAdd(value.dbContactSocial)
-
+        // console.log(value.dbContactHeadImage.toString('utf-8'))
         var nameMd5 = md5(value.userName)
+
         mailList[nameMd5] = {
           wechatID: value.userName,
           nickName: nickName,
@@ -130,36 +131,84 @@ class Friend extends React.Component {
     return mailList
   }
 
+  async getMessage(item) {
+    console.log(item)
+    const db = new HandleDB({
+      databaseFile: sqlitefilePath,
+      readOnly: true,
+    })
+    await db.connectDataBase()
+    let sql = 'SELECT * FROM ' + item.chatName + ' order by CreateTime desc limit 100'
+
+    let messageData = await db.sql(sql, 'all')
+    this.setState({
+      myMessages: messageData.reverse(),
+    })
+    // eslint-disable-next-line react/destructuring-assignment
+    console.log(this.state.myMessages)
+  }
+
   render() {
-    const { myFriends, myGroups, myOfficials } = this.state
+    const { myFriends, myGroups, myOfficials, myMessages } = this.state
     return (
-      <div>
-        <Link to="/">
-          <Button>回到首页</Button>
-        </Link>
+      <div style={{ paddingBottom: '20px', overflow: 'hidden' }}>
         <div styleName="left-container">
           <Tabs styleName="outer-tabs">
             <TabPane tab="朋友" key="1">
-              {Object.keys(myFriends).map(key => (
-                <p key={key}>
-                  {myFriends[key].nickName[0]}
-                  {myFriends[key].nickName.length > 1
-                    ? `（${myFriends[key].nickName[myFriends[key].nickName.length - 1]}）`
+              {myFriends.map(item => (
+                <p
+                  onClick={() => {
+                    this.getMessage(item)
+                  }}
+                  key={item.chatMd5}
+                >
+                  <Avatar src={`${item.headImg}/132`}>USER</Avatar>
+                  {item.nickName[0]}
+                  {item.nickName.length > 1
+                    ? `（${item.nickName[item.nickName.length - 1]}）`
                     : null}
+                  <span>{item.count}条消息</span>
                 </p>
               ))}
             </TabPane>
             <TabPane tab="群组" key="2">
-              {Object.keys(myGroups).map(key => (
-                <p key={key}>{myGroups[key].nickName}</p>
+              {myGroups.map(item => (
+                <p key={item.chatMd5}>
+                  <Avatar src={`${item.headImg}/0`}>USER</Avatar>
+                  {item.nickName}
+                  <span>{item.count}条消息</span>
+                </p>
               ))}
             </TabPane>
             <TabPane tab="公众号" key="3">
-              {Object.keys(myOfficials).map(key => (
-                <p key={key}>{myOfficials[key].nickName}</p>
+              {myOfficials.map(item => (
+                <p key={item.chatMd5}>
+                  <Avatar src={`${item.headImg}/132`}>USER</Avatar>
+                  {item.nickName}
+                  <span>{item.count}条消息</span>
+                </p>
               ))}
             </TabPane>
           </Tabs>
+        </div>
+        <div styleName="right-container">
+          <p styleName="time">2018.02.03 12:00</p>
+          {myMessages.map(item => {
+            // 只显示文字消息
+            if (item.Type !== 1) {
+              return null
+            } else {
+              return (
+                <div
+                  key={item.MesLocalID}
+                  styleName={item.Des === 0 ? 'message flex-reverse' : 'message'}
+                >
+                  <Avatar>USER</Avatar>
+                  <p>{item.Message}</p>
+                </div>
+              )
+            }
+          })}
         </div>
       </div>
     )

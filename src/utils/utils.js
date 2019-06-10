@@ -1,8 +1,13 @@
 export function getNickName(fullNameInfo) {
-  // 过滤掉不能正常展示的ASCII码
-  // eslint-disable-next-line no-control-regex
-  var sep = fullNameInfo.replace(/[\x00-\x1f]+/g, '|').split('"')[0]
-  return sep.split('|').filter(value => value !== '')
+  // 过滤掉不能正常展示的ASCII码，不间断空格
+  // https://www.jianshu.com/p/4317e3749a13
+  var sep = fullNameInfo
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\x00-\x1f]+/g, '-')
+    .split('"')[0]
+    .replace(/\u00A0|\u0020|\u3000/g, ' ')
+
+  return sep.split('-').filter(value => !!value && value != ' ')
 }
 
 export function getChatterMd5(tableName) {
@@ -14,6 +19,9 @@ export function getHeadImg(headImage) {
   var str = headImage.toString('utf8')
   var start = str.search('http:')
   var end = str.search('/132')
+  if (end === -1) {
+    end = str.search('/0')
+  }
   return str.slice(start, end)
 }
 
