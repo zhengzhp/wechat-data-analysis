@@ -1,12 +1,21 @@
+/* eslint-disable react/sort-comp */
 import React from 'react'
-import { Link } from 'react-router-dom'
 import md5 from 'js-md5'
 import { Tabs, Avatar } from 'antd'
 import textEncoding from 'text-encoding'
-import '../styles/friend.css'
+import moment from 'moment'
 
-import { getNickName, getChatterMd5, getHeadImg, getMomentsBg, isPhoneAdd } from '../utils/utils'
+import { parseString } from 'xml2js'
+import {
+  getNickName,
+  getChatterMd5,
+  getHeadImg,
+  getMomentsBg,
+  isPhoneAdd,
+  throttle,
+} from '../utils/utils'
 import HandleDB from '../utils/handledb'
+import '../styles/friend.css'
 
 const { TabPane } = Tabs
 const TextDecoder = textEncoding.TextDecoder
@@ -33,9 +42,30 @@ class Friend extends React.Component {
   async componentDidMount() {
     // const { match } = this.props
     // const userMD5 = match.params.id
+    parseString(
+      `<root>
+        <voipinvitemsg>
+          <roomid>0</roomid>
+          <key>0</key>
+          <status>4</status>
+          <invitetype>1</invitetype>
+        </voipinvitemsg>
+        <voipextinfo>
+          <recvtime>1559133111</recvtime>
+        </voipextinfo>
+        <voiplocalinfo>
+          <wordingtype>1</wordingtype>
+          <duration>0</duration>
+        </voiplocalinfo>
+      </root>`,
+      (_, result) => {
+        console.log(result)
+      }
+    )
     await this.getFriends()
     let PromiseList = await this.getChat()
     Promise.all(PromiseList).then(result => {
+      // 按照消息条数排序
       let friends = Object.values(friendList).sort((a, b) => b.count - a.count)
       let groups = Object.values(groupList).sort((a, b) => b.count - a.count)
       let officials = Object.values(officialList).sort((a, b) => b.count - a.count)
@@ -131,8 +161,16 @@ class Friend extends React.Component {
     return mailList
   }
 
+  scrollThrottle = throttle(() => {
+    let ele = document.getElementById('msg-box')
+    let scrollTop = ele.scrollTop
+    console.log(scrollTop)
+    if (scrollTop < 100) {
+      console.log('加载更多')
+    }
+  }, 500)
+
   async getMessage(item) {
-    console.log(item)
     const db = new HandleDB({
       databaseFile: sqlitefilePath,
       readOnly: true,
@@ -140,10 +178,45 @@ class Friend extends React.Component {
     await db.connectDataBase()
     let sql = 'SELECT * FROM ' + item.chatName + ' order by CreateTime desc limit 100'
 
-    let messageData = await db.sql(sql, 'all')
-    this.setState({
-      myMessages: messageData.reverse(),
+    let data = await db.sql(sql, 'all')
+
+    let messageData = data.reverse()
+    messageData = messageData.map((item, index) => {
+      if (item.Type === 50) {
+        parseString(
+          `<root>
+            ${item.Message}
+          </root>`,
+          (_, result) => {
+            let seconds = result.root.voiplocalinfo[0].duration[0]
+            item.MsgContent = {
+              duration: `${Math.floor(seconds / 60)}:${seconds % 60}`,
+              type: result.root.voiplocalinfo[0].wordingtype[0],
+            }
+          }
+        )
+      }
+      if (
+        index < messageData.length - 1 &&
+        messageData[index + 1].CreateTime - item.CreateTime > 60 * 5
+      ) {
+        item.MsgDate = moment(messageData[index + 1].CreateTime * 1000).format('YYYY-MM-DD HH:mm')
+      }
+      return item
     })
+    console.log(messageData)
+    this.setState(
+      {
+        myMessages: messageData,
+      },
+      () => {
+        var ele = document.getElementById('msg-box')
+        ele.scrollTop = ele.scrollHeight
+
+        ele.removeEventListener('scroll', this.scrollThrottle, false)
+        ele.addEventListener('scroll', this.scrollThrottle, false)
+      }
+    )
     // eslint-disable-next-line react/destructuring-assignment
     console.log(this.state.myMessages)
   }
@@ -191,24 +264,59 @@ class Friend extends React.Component {
             </TabPane>
           </Tabs>
         </div>
-        <div styleName="right-container">
-          <p styleName="time">2018.02.03 12:00</p>
-          {myMessages.map(item => {
-            // 只显示文字消息
-            if (item.Type !== 1) {
-              return null
-            } else {
-              return (
-                <div
-                  key={item.MesLocalID}
-                  styleName={item.Des === 0 ? 'message flex-reverse' : 'message'}
-                >
-                  <Avatar>USER</Avatar>
-                  <p>{item.Message}</p>
-                </div>
-              )
-            }
-          })}
+        <div id="msg-box" styleName="right-container">
+          {myMessages.length > 0 ? (
+            myMessages.map(item => {
+              // 只显示文字消息
+              if (item.Type !== 1) {
+                if (item.Type === 50) {
+                  return (
+                    <div key={item.MesLocalID}>
+                      <div styleName={item.Des === 0 ? 'message flex-reverse' : 'message'}>
+                        <Avatar>USER</Avatar>
+                        <p>语音通话时长 {item.MsgContent.duration}</p>
+                      </div>
+                      <p styleName="time">{item.MsgDate}</p>
+                    </div>
+                  )
+                } else {
+                  return (
+                    <div key={item.MesLocalID}>
+                      <div styleName={item.Des === 0 ? 'message flex-reverse' : 'message'}>
+                        <Avatar>USER</Avatar>
+                        <p style={{ backgroundColor: 'burlywood' }}>其他类型消息</p>
+                      </div>
+                      <p styleName="time">{item.MsgDate}</p>
+                    </div>
+                  )
+                }
+              } else {
+                if (item.MsgDate) {
+                  return (
+                    <div key={item.MesLocalID}>
+                      <div styleName={item.Des === 0 ? 'message flex-reverse' : 'message'}>
+                        <Avatar>USER</Avatar>
+                        <p>{item.Message}</p>
+                      </div>
+                      <p styleName="time">{item.MsgDate}</p>
+                    </div>
+                  )
+                } else {
+                  return (
+                    <div
+                      key={item.MesLocalID}
+                      styleName={item.Des === 0 ? 'message flex-reverse' : 'message'}
+                    >
+                      <Avatar>USER</Avatar>
+                      <p>{item.Message}</p>
+                    </div>
+                  )
+                }
+              }
+            })
+          ) : (
+            <p styleName="empty">暂无消息</p>
+          )}
         </div>
       </div>
     )

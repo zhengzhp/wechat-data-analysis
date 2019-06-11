@@ -39,6 +39,14 @@
     text-align: center;
   }
 
+  .empty {
+    display: flex;
+    height: 100%;
+    margin: 0;
+    justify-content: center;
+    align-items: center;
+  }
+
   .message {
     display: flex;
     margin-bottom: 20px;

@@ -1,4 +1,4 @@
-let WCDB_Contact_Friend = {
+let WCDB_Contact = {
   certificationFlag: 0, // 0 用户，群组(漂流瓶、朋友推荐消息也包含在内) 8 服务号(个人)？ 24 公众号 56 微信团队
   dbContactBrand: null,
   dbContactChatRoom: null,
@@ -13,7 +13,20 @@ let WCDB_Contact_Friend = {
   extFlag: 0,
   imgStatus: 2,
   openIMAppid: null,
-  type: 1, // 状态，暂不知道对应规则
+  type: 1, // 类型，暂不知道对应规则
   userName: 'wxid_3je9brbhp72222', // 用户名个人以wxid_开头，群组后面有@chatroom标识，公众号、服务号以gh_开头
   _packed_DBContactTable: null,
+}
+
+let MM = {
+  CreateTime: 1559133436,
+  Des: 1, // 消息发送者 0，自己 1，对方
+  ImgStatus: 1,
+  MesLocalID: 10938, // 本地消息id
+  MesSvrID: 0,
+  Message: // 消息内容，string或xml格式  wordingtype 0 已取消, 4 对方发起通话成功 6 对方忙线中
+    '<voipinvitemsg><roomid>0</roomid><key>0</key><status>4</status><invitetype>1</invitetype></voipinvitemsg><voipextinfo><recvtime>1559133436</recvtime></voipextinfo><voiplocalinfo><wordingtype>4</wordingtype><duration>147</duration></voiplocalinfo>',
+  Status: 4,
+  TableVer: 0,
+  Type: 50, // 消息类型 1，文字 50，语音电话
 }
