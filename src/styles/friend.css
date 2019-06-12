@@ -1,15 +1,30 @@
 .left-container {
-  width: 35%;
-  float: left;
-  min-width: 350px;
+  position: fixed;
+  width: 32%;
+  height: calc(100vh - 150px);
+  top: 100px;
+  left: 2.5%;
+  overflow: scroll;
+  border: 1px solid rgba(216, 216, 216, .6);
 
   :global {
     .ant-tabs-nav {
-      display: block;
+      position: fixed;
+      width: 32%;
+      left: 2.5%;
+      background-color: #fff;
+      z-index: 10;
+      border-right: 1px solid rgba(216, 216, 216, .6);
+      border-left: 1px solid rgba(216, 216, 216, .6);
+      border-bottom: 1px solid rgba(216, 216, 216, .6);
 
       >div {
         display: flex;
         justify-content: space-around;
+      }
+
+      .ant-tabs-ink-bar {
+        bottom: -1px;
       }
     }
 
@@ -61,6 +76,13 @@
       word-break: break-all;
     }
   }
+
+  :global {
+    .ant-spin {
+      margin: 0 auto 20px auto;
+      display: block;
+    }
+  }
 }
 
 .flex-reverse {
@@ -68,21 +90,29 @@
 }
 
 .outer-tabs {
+  padding-top: 45px !important;
+
   :global {
     .ant-avatar {
       margin: 0 10px;
     }
 
+    .ant-tabs-top-bar {
+      position: absolute;
+      width: 100%;
+      top: 0;
+      margin-bottom: 5px;
+      border-bottom: 1px solid rgba(216, 216, 216, .6);
+    }
+
     .ant-tabs-tabpane {
-      width: 96% !important;
-      margin: 0 2%;
-      border: 1px solid rgba(216, 216, 216, .6);
+      margin: 0;
 
       p {
         padding: 0 10px;
-        margin: 0 10px;
-        height: 50px;
-        line-height: 50px;
+        margin: 0;
+        height: 55px;
+        line-height: 55px;
         border-bottom: 1px solid rgba(216, 216, 216, .6);
         cursor: pointer;
 

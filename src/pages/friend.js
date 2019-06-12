@@ -1,7 +1,7 @@
 /* eslint-disable react/sort-comp */
 import React from 'react'
 import md5 from 'js-md5'
-import { Tabs, Avatar } from 'antd'
+import { Tabs, Avatar, Spin } from 'antd'
 import textEncoding from 'text-encoding'
 import moment from 'moment'
 
@@ -36,32 +36,17 @@ class Friend extends React.Component {
       myGroups: [],
       myOfficials: [],
       myMessages: [],
+      chatName: '',
+      nowScrollTop: 0,
+      isLoad: false,
+      pageIndex: 0,
+      pageSize: 100,
     }
   }
 
   async componentDidMount() {
     // const { match } = this.props
     // const userMD5 = match.params.id
-    parseString(
-      `<root>
-        <voipinvitemsg>
-          <roomid>0</roomid>
-          <key>0</key>
-          <status>4</status>
-          <invitetype>1</invitetype>
-        </voipinvitemsg>
-        <voipextinfo>
-          <recvtime>1559133111</recvtime>
-        </voipextinfo>
-        <voiplocalinfo>
-          <wordingtype>1</wordingtype>
-          <duration>0</duration>
-        </voiplocalinfo>
-      </root>`,
-      (_, result) => {
-        console.log(result)
-      }
-    )
     await this.getFriends()
     let PromiseList = await this.getChat()
     Promise.all(PromiseList).then(result => {
@@ -79,6 +64,7 @@ class Friend extends React.Component {
     })
   }
 
+  // 查询聊天信息
   async getChat() {
     const db = new HandleDB({
       databaseFile: sqlitefilePath,
@@ -130,6 +116,7 @@ class Friend extends React.Component {
     return PromiseList
   }
 
+  // 获取聊天对象
   async getFriends() {
     const contactDb = new HandleDB({
       databaseFile: sqlitePath,
@@ -163,35 +150,70 @@ class Friend extends React.Component {
 
   scrollThrottle = throttle(() => {
     let ele = document.getElementById('msg-box')
+    let { pageIndex, pageSize, myMessages } = this.state
+
+    // 查询出来所有数据后禁止加载更多
+    if (myMessages.length % pageSize !== 0) {
+      this.setState({
+        isLoad: false,
+      })
+      return
+    }
     let scrollTop = ele.scrollTop
-    console.log(scrollTop)
     if (scrollTop < 100) {
-      console.log('加载更多')
+      setTimeout(() => {
+        this.setState(
+          {
+            pageIndex: pageIndex + 1,
+          },
+          this.getMessage
+        )
+      }, 100)
     }
   }, 500)
 
-  async getMessage(item) {
+  selectChat(chatName) {
+    // 禁止切换时触发load动作
+    var ele = document.getElementById('msg-box')
+    ele.removeEventListener('scroll', this.scrollThrottle, false)
+    this.setState(
+      {
+        myMessages: [],
+        pageIndex: 0,
+        chatName,
+      },
+      this.getMessage
+    )
+  }
+
+  // 获取聊天记录
+  async getMessage() {
+    const { pageSize, pageIndex, chatName, myMessages } = this.state
     const db = new HandleDB({
       databaseFile: sqlitefilePath,
       readOnly: true,
     })
     await db.connectDataBase()
-    let sql = 'SELECT * FROM ' + item.chatName + ' order by CreateTime desc limit 100'
+    let sql = `SELECT * FROM ${chatName} order by CreateTime desc limit ${pageSize} offset ${pageIndex *
+      pageSize}`
 
     let data = await db.sql(sql, 'all')
 
     let messageData = data.reverse()
     messageData = messageData.map((item, index) => {
+      // 语音消息
       if (item.Type === 50) {
         parseString(
           `<root>
             ${item.Message}
           </root>`,
           (_, result) => {
-            let seconds = result.root.voiplocalinfo[0].duration[0]
+            let seconds = result.root.voiplocalinfo && result.root.voiplocalinfo[0].duration[0]
+            let wordingtype =
+              result.root.voiplocalinfo && result.root.voiplocalinfo[0].wordingtype[0]
             item.MsgContent = {
               duration: `${Math.floor(seconds / 60)}:${seconds % 60}`,
-              type: result.root.voiplocalinfo[0].wordingtype[0],
+              type: wordingtype,
             }
           }
         )
@@ -204,14 +226,20 @@ class Friend extends React.Component {
       }
       return item
     })
-    console.log(messageData)
+    var ele = document.getElementById('msg-box')
     this.setState(
       {
-        myMessages: messageData,
+        myMessages: messageData.concat(myMessages),
+        isLoad: true,
+        nowScrollTop: ele.scrollHeight + 25,
       },
       () => {
-        var ele = document.getElementById('msg-box')
-        ele.scrollTop = ele.scrollHeight
+        const { nowScrollTop } = this.state
+        if (pageIndex === 0) {
+          ele.scrollTop = ele.scrollHeight
+        } else {
+          ele.scrollTop = ele.scrollHeight - nowScrollTop
+        }
 
         ele.removeEventListener('scroll', this.scrollThrottle, false)
         ele.addEventListener('scroll', this.scrollThrottle, false)
@@ -222,7 +250,7 @@ class Friend extends React.Component {
   }
 
   render() {
-    const { myFriends, myGroups, myOfficials, myMessages } = this.state
+    const { myFriends, myGroups, myOfficials, myMessages, isLoad } = this.state
     return (
       <div style={{ paddingBottom: '20px', overflow: 'hidden' }}>
         <div styleName="left-container">
@@ -231,7 +259,7 @@ class Friend extends React.Component {
               {myFriends.map(item => (
                 <p
                   onClick={() => {
-                    this.getMessage(item)
+                    this.selectChat(item.chatName)
                   }}
                   key={item.chatMd5}
                 >
@@ -246,7 +274,12 @@ class Friend extends React.Component {
             </TabPane>
             <TabPane tab="群组" key="2">
               {myGroups.map(item => (
-                <p key={item.chatMd5}>
+                <p
+                  onClick={() => {
+                    this.selectChat(item.chatName)
+                  }}
+                  key={item.chatMd5}
+                >
                   <Avatar src={`${item.headImg}/0`}>USER</Avatar>
                   {item.nickName}
                   <span>{item.count}条消息</span>
@@ -255,7 +288,12 @@ class Friend extends React.Component {
             </TabPane>
             <TabPane tab="公众号" key="3">
               {myOfficials.map(item => (
-                <p key={item.chatMd5}>
+                <p
+                  onClick={() => {
+                    this.selectChat(item.chatName)
+                  }}
+                  key={item.chatMd5}
+                >
                   <Avatar src={`${item.headImg}/132`}>USER</Avatar>
                   {item.nickName}
                   <span>{item.count}条消息</span>
@@ -265,6 +303,7 @@ class Friend extends React.Component {
           </Tabs>
         </div>
         <div id="msg-box" styleName="right-container">
+          {isLoad ? <Spin /> : null}
           {myMessages.length > 0 ? (
             myMessages.map(item => {
               // 只显示文字消息
