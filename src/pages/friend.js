@@ -15,6 +15,7 @@ import {
   throttle,
 } from '../utils/utils'
 import HandleDB from '../utils/handledb'
+import currUser from '../data/user.json'
 import '../styles/friend.css'
 
 const { TabPane } = Tabs
@@ -36,6 +37,8 @@ class Friend extends React.Component {
       myGroups: [],
       myOfficials: [],
       myMessages: [],
+      currHeadImg: currUser['5d36756da6a6f71e68185f13ddd4bb18'].headUrl,
+      friendHeadImg: '',
       chatName: '',
       nowScrollTop: 0,
       isLoad: false,
@@ -172,7 +175,7 @@ class Friend extends React.Component {
     }
   }, 500)
 
-  selectChat(chatName) {
+  selectChat(data) {
     // 禁止切换时触发load动作
     var ele = document.getElementById('msg-box')
     ele.removeEventListener('scroll', this.scrollThrottle, false)
@@ -180,7 +183,8 @@ class Friend extends React.Component {
       {
         myMessages: [],
         pageIndex: 0,
-        chatName,
+        chatName: data.chatName,
+        friendHeadImg: data.headImg,
       },
       this.getMessage
     )
@@ -250,7 +254,15 @@ class Friend extends React.Component {
   }
 
   render() {
-    const { myFriends, myGroups, myOfficials, myMessages, isLoad } = this.state
+    const {
+      myFriends,
+      myGroups,
+      myOfficials,
+      myMessages,
+      isLoad,
+      friendHeadImg,
+      currHeadImg,
+    } = this.state
     return (
       <div style={{ paddingBottom: '20px', overflow: 'hidden' }}>
         <div styleName="left-container">
@@ -259,7 +271,7 @@ class Friend extends React.Component {
               {myFriends.map(item => (
                 <p
                   onClick={() => {
-                    this.selectChat(item.chatName)
+                    this.selectChat(item)
                   }}
                   key={item.chatMd5}
                 >
@@ -276,7 +288,7 @@ class Friend extends React.Component {
               {myGroups.map(item => (
                 <p
                   onClick={() => {
-                    this.selectChat(item.chatName)
+                    this.selectChat(item)
                   }}
                   key={item.chatMd5}
                 >
@@ -290,7 +302,7 @@ class Friend extends React.Component {
               {myOfficials.map(item => (
                 <p
                   onClick={() => {
-                    this.selectChat(item.chatName)
+                    this.selectChat(item)
                   }}
                   key={item.chatMd5}
                 >
@@ -303,58 +315,48 @@ class Friend extends React.Component {
           </Tabs>
         </div>
         <div id="msg-box" styleName="right-container">
-          {isLoad ? <Spin /> : null}
           {myMessages.length > 0 ? (
-            myMessages.map(item => {
-              // 只显示文字消息
-              if (item.Type !== 1) {
-                if (item.Type === 50) {
+            <React.Fragment>
+              {isLoad ? <Spin /> : <p style={{ textAlign: 'center' }}>已显示全部消息</p>}
+              {myMessages.map(item => {
+                // 判断消息类型
+                if (item.Type !== 1) {
                   return (
                     <div key={item.MesLocalID}>
                       <div styleName={item.Des === 0 ? 'message flex-reverse' : 'message'}>
-                        <Avatar>USER</Avatar>
-                        <p>语音通话时长 {item.MsgContent.duration}</p>
+                        {item.Des === 0 ? (
+                          <Avatar src={`${currHeadImg}`}>USER</Avatar>
+                        ) : (
+                          <Avatar src={`${friendHeadImg}/132`}>USER</Avatar>
+                        )}
+                        {item.Type === 50 ? (
+                          <p>语音通话时长 {item.MsgContent.duration}</p>
+                        ) : (
+                          <p style={{ backgroundColor: 'burlywood' }}>其他类型消息</p>
+                        )}
                       </div>
-                      <p styleName="time">{item.MsgDate}</p>
+                      {item.MsgDate ? <p styleName="time">{item.MsgDate}</p> : null}
                     </div>
                   )
                 } else {
                   return (
                     <div key={item.MesLocalID}>
                       <div styleName={item.Des === 0 ? 'message flex-reverse' : 'message'}>
-                        <Avatar>USER</Avatar>
-                        <p style={{ backgroundColor: 'burlywood' }}>其他类型消息</p>
-                      </div>
-                      <p styleName="time">{item.MsgDate}</p>
-                    </div>
-                  )
-                }
-              } else {
-                if (item.MsgDate) {
-                  return (
-                    <div key={item.MesLocalID}>
-                      <div styleName={item.Des === 0 ? 'message flex-reverse' : 'message'}>
-                        <Avatar>USER</Avatar>
+                        {item.Des === 0 ? (
+                          <Avatar src={`${currHeadImg}`}>USER</Avatar>
+                        ) : (
+                          <Avatar src={`${friendHeadImg}/132`}>USER</Avatar>
+                        )}
                         <p>{item.Message}</p>
                       </div>
-                      <p styleName="time">{item.MsgDate}</p>
-                    </div>
-                  )
-                } else {
-                  return (
-                    <div
-                      key={item.MesLocalID}
-                      styleName={item.Des === 0 ? 'message flex-reverse' : 'message'}
-                    >
-                      <Avatar>USER</Avatar>
-                      <p>{item.Message}</p>
+                      {item.MsgDate ? <p styleName="time">{item.MsgDate}</p> : null}
                     </div>
                   )
                 }
-              }
-            })
+              })}
+            </React.Fragment>
           ) : (
-            <p styleName="empty">暂无消息</p>
+            <p styleName="empty">请选择聊天对象</p>
           )}
         </div>
       </div>
